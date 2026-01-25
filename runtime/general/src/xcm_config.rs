@@ -2,19 +2,19 @@ use core::{marker::PhantomData, ops::ControlFlow};
 
 use frame_support::{
     log, match_types, parameter_types,
-    traits::{ConstU32, Everything, Nothing},
+    traits::{ConstU32, Everything, Nothing, ProcessMessageError},
     weights::Weight,
 };
 use pallet_xcm::XcmPassthrough;
 use polkadot_parachain::primitives::Sibling;
 use polkadot_runtime_common::impls::ToAuthor;
-use xcm::{latest::prelude::*, CreateMatcher, MatchXcm};
+use xcm::latest::prelude::*;
 use xcm_builder::{
     AccountId32Aliases, AllowExplicitUnpaidExecutionFrom, AllowTopLevelPaidExecutionFrom,
-    CurrencyAdapter, EnsureXcmOrigin, FixedWeightBounds, IsConcrete, NativeAsset, ParentIsPreset,
-    RelayChainAsNative, SiblingParachainAsNative, SiblingParachainConvertsVia,
-    SignedAccountId32AsNative, SignedToAccountId32, SovereignSignedViaLocation, TakeWeightCredit,
-    UsingComponents, WithComputedOrigin,
+    CreateMatcher, CurrencyAdapter, EnsureXcmOrigin, FixedWeightBounds, IsConcrete, MatchXcm,
+    NativeAsset, ParentIsPreset, RelayChainAsNative, SiblingParachainAsNative,
+    SiblingParachainConvertsVia, SignedAccountId32AsNative, SignedToAccountId32,
+    SovereignSignedViaLocation, TakeWeightCredit, UsingComponents, WithComputedOrigin,
 };
 use xcm_executor::{traits::ShouldExecute, XcmExecutor};
 
@@ -22,6 +22,7 @@ use crate::{
     AccountId, AllPalletsWithSystem, Balances, ParachainInfo, ParachainSystem, PolkadotXcm,
     Runtime, RuntimeCall, RuntimeEvent, RuntimeOrigin, WeightToFee, XcmpQueue,
 };
+use frame_system::EnsureRoot;
 
 parameter_types! {
     pub const RelayLocation: MultiLocation = MultiLocation::parent();
@@ -112,7 +113,7 @@ where
         message: &mut [Instruction<RuntimeCall>],
         max_weight: Weight,
         weight_credit: &mut Weight,
-    ) -> Result<(), ()> {
+    ) -> Result<(), ProcessMessageError> {
         Deny::should_execute(origin, message, max_weight, weight_credit)?;
         Allow::should_execute(origin, message, max_weight, weight_credit)
     }
@@ -126,7 +127,7 @@ impl ShouldExecute for DenyReserveTransferToRelayChain {
         message: &mut [Instruction<RuntimeCall>],
         _max_weight: Weight,
         _weight_credit: &mut Weight,
-    ) -> Result<(), ()> {
+    ) -> Result<(), ProcessMessageError> {
         message.matcher().match_next_inst_while(
             |_| true,
             |inst| match inst {
@@ -140,7 +141,7 @@ impl ShouldExecute for DenyReserveTransferToRelayChain {
                 | TransferReserveAsset {
                     dest: MultiLocation { parents: 1, interior: Here }, ..
                 } => {
-                    Err(()) // Deny
+                    Err(ProcessMessageError::Unsupported) // Deny
                 }
                 // An unexpected reserve transfer has arrived from the Relay Chain. Generally,
                 // `IsReserve` should not allow this, but we just log it here.
@@ -227,13 +228,16 @@ parameter_types! {
 
 impl pallet_xcm::Config for Runtime {
     // ^ Override for AdvertisedXcmVersion default
+    type AdminOrigin = EnsureRoot<AccountId>;
     type AdvertisedXcmVersion = pallet_xcm::CurrentXcmVersion;
     type Currency = Balances;
     type CurrencyMatcher = ();
     type ExecuteXcmOrigin = EnsureXcmOrigin<RuntimeOrigin, LocalOriginToLocation>;
     type MaxLockers = ConstU32<8>;
+    type MaxRemoteLockConsumers = ConstU32<0>;
     #[cfg(feature = "runtime-benchmarks")]
     type ReachableDest = ReachableDest;
+    type RemoteLockConsumerIdentifier = ();
     type RuntimeCall = RuntimeCall;
     type RuntimeEvent = RuntimeEvent;
     type RuntimeOrigin = RuntimeOrigin;

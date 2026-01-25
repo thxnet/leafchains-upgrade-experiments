@@ -2,16 +2,13 @@
   description = "THXNET. Leafchains";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     flake-utils.url = "github:numtide/flake-utils";
     fenix = {
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    crane = {
-      url = "github:ipetkov/crane";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    crane.url = "github:ipetkov/crane";
   };
 
   outputs = { self, nixpkgs, flake-utils, fenix, crane }:
@@ -32,7 +29,7 @@
 
           rustToolchain = fenix.packages.${system}.fromToolchainFile {
             file = ./rust-toolchain.toml;
-            sha256 = "sha256-DCQf3SCznJP8yCYJ4Vziqq3KZkacs+PrWkCir6y3tGA=";
+            sha256 = "sha256-6HXUaEJQRPTsvpgw7T0jS47IuIz8UmjsTXl/Fx/5n3o=";
           };
 
           rustPlatform = pkgs.makeRustPlatform {
@@ -60,17 +57,16 @@
             inherit src;
 
             nativeBuildInputs = with pkgs; [
-              llvmPackages.clang
-              llvmPackages.libclang
+              llvmPackages_14.clang
+              llvmPackages_14.libclang
             ];
 
             PROTOC = "${pkgs.protobuf}/bin/protoc";
             PROTOC_INCLUDE = "${pkgs.protobuf}/include";
 
-            LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
+            LIBCLANG_PATH = "${pkgs.llvmPackages_14.libclang.lib}/lib";
 
             SUBSTRATE_CLI_GIT_COMMIT_HASH = "";
-            SKIP_WASM_BUILD = "true";
           };
           cargoArtifacts = craneLib.buildDepsOnly commonArgs;
         in

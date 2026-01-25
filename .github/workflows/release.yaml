@@ -36,7 +36,7 @@ jobs:
       - name: Build WASM runtimes
         run: |
           nix develop --command bash -c "WASM_TARGET_DIRECTORY=$(pwd) cargo build --release --package general-runtime"
-          mv general_runtime.wasm general-runtime.wasm
+          cp target/release/wbuild/general-runtime/general_runtime.compact.compressed.wasm general-runtime.wasm
 
       - name: Publish WASM runtimes
         uses: softprops/action-gh-release@v1

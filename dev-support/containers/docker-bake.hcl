@@ -21,16 +21,10 @@ target "builder" {
   dockerfile = "dev-support/containers/debian/builder/Containerfile"
   target     = "builder"
   contexts = {
-    substrate-based = "docker-image://ghcr.io/thxnet/ci-containers/substrate-based:build-2023.06.30-bd9d7aa"
+    ci-linux = "docker-image://docker.io/paritytech/ci-linux:production"
   }
   args = {
-    DEBUG                 = "${DEBUG}"
-    RUSTC_WRAPPER         = "/usr/bin/sccache"
-    AWS_ACCESS_KEY_ID     = null
-    AWS_SECRET_ACCESS_KEY = null
-    SCCACHE_BUCKET        = null
-    SCCACHE_ENDPOINT      = null
-    SCCACHE_S3_USE_SSL    = null
+    DEBUG = "${DEBUG}"
   }
   platforms = ["linux/amd64"]
 }
