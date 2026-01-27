@@ -1,0 +1,73 @@
+# Zombienet configuration for local development
+# This launches:
+# - 1 Relay Chain (thxnet-local with 2 validators)
+# - LeafchainA (Para ID 2000) with 2 collators (Alice, Bob)
+# - LeafchainB (Para ID 2001) with 2 collators (Charlie, Dave)
+#
+# Usage:
+#   zombienet spawn scripts/zombienet-local.toml
+#
+# Prerequisites:
+#   - Build rootchain: cargo build --release -p polkadot --features thxnet-native
+#   - Build leafchain: cargo build --release -p thxnet-leafchain
+#   - Install zombienet: npm install -g @zombienet/cli
+#     or download from https://github.com/paritytech/zombienet/releases
+
+[settings]
+timeout = 1000
+
+[relaychain]
+chain = "thxnet-local"
+default_command = "../rootchain/target/release/polkadot"
+default_args = ["-lparachain=debug"]
+
+  [[relaychain.nodes]]
+  name = "alice"
+  validator = true
+
+  [[relaychain.nodes]]
+  name = "bob"
+  validator = true
+
+[[parachains]]
+id = 2000
+chain = "leafchain-a-local"
+cumulus_based = true
+
+  [parachains.collator]
+  name = "leafchain-a-collator-1"
+  command = "./target/release/thxnet-leafchain"
+  args = ["-lparachain=debug,xcm=trace"]
+
+  [[parachains.collators]]
+  name = "leafchain-a-collator-2"
+  command = "./target/release/thxnet-leafchain"
+  args = ["-lparachain=debug,xcm=trace"]
+
+[[parachains]]
+id = 2001
+chain = "leafchain-b-local"
+cumulus_based = true
+
+  [parachains.collator]
+  name = "leafchain-b-collator-1"
+  command = "./target/release/thxnet-leafchain"
+  args = ["-lparachain=debug,xcm=trace"]
+
+  [[parachains.collators]]
+  name = "leafchain-b-collator-2"
+  command = "./target/release/thxnet-leafchain"
+  args = ["-lparachain=debug,xcm=trace"]
+
+# HRMP channels for cross-chain messaging
+[[hrmp_channels]]
+sender = 2000
+recipient = 2001
+max_capacity = 8
+max_message_size = 512
+
+[[hrmp_channels]]
+sender = 2001
+recipient = 2000
+max_capacity = 8
+max_message_size = 512

@@ -41,6 +41,11 @@ impl SubstrateCli for Cli {
 
     fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
         Ok(match id {
+            // local development
+            "dev" | "development" => Box::new(chain_spec::local::development_config()),
+            "leafchain-a-local" | "local-a" => Box::new(chain_spec::local::leafchain_a_local_config()),
+            "leafchain-b-local" | "local-b" => Box::new(chain_spec::local::leafchain_b_local_config()),
+
             // testnet
             "thx-testnet" => Box::new(chain_spec::testnet::thx::testnet_config()),
             "lmt-testnet" => Box::new(chain_spec::testnet::lmt::testnet_config()),

@@ -6,6 +6,8 @@ members = [
    "node",
    "pallets/trustless-agent",
    "runtime/general",
+   "xcm/xcm-emulator",
+   "integration-tests/xcm",
 ]
 
 [workspace.package]
@@ -15,3 +17,17 @@ homepage = "https://thxnet.org/"
 repository = "https://github.com/thxnet/leafchains"
 license = "GPL-3.0-only"
 edition = "2021"
+
+# Patch polkadot crates to use local rootchain paths
+# This ensures all polkadot-related types are consistent across dependencies
+[patch."https://github.com/paritytech/polkadot"]
+polkadot-parachain = { path = "../rootchain/parachain" }
+polkadot-primitives = { path = "../rootchain/primitives" }
+polkadot-core-primitives = { path = "../rootchain/core-primitives" }
+polkadot-runtime-parachains = { path = "../rootchain/runtime/parachains" }
+polkadot-runtime-common = { path = "../rootchain/runtime/common" }
+polkadot-runtime-metrics = { path = "../rootchain/runtime/metrics" }
+xcm = { path = "../rootchain/xcm" }
+xcm-executor = { path = "../rootchain/xcm/xcm-executor" }
+xcm-builder = { path = "../rootchain/xcm/xcm-builder" }
+pallet-xcm = { path = "../rootchain/xcm/pallet-xcm" }
