@@ -37,8 +37,8 @@ cumulus-test-relay-sproof-builder = { git = "https://github.com/paritytech/cumul
 parachains-common = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43" }
 
 # Polkadot crates - use local rootchain paths to avoid version conflicts
-polkadot-parachain = { path = "../../../rootchain/parachain" }
-xcm = { path = "../../../rootchain/xcm" }
-xcm-executor = { path = "../../../rootchain/xcm/xcm-executor" }
-polkadot-primitives = { path = "../../../rootchain/primitives" }
-polkadot-runtime-parachains = { path = "../../../rootchain/runtime/parachains" }
+polkadot-parachain = { path = "../../../rootchain-upgrade-experiments/parachain" }
+xcm = { path = "../../../rootchain-upgrade-experiments/xcm" }
+xcm-executor = { path = "../../../rootchain-upgrade-experiments/xcm/xcm-executor" }
+polkadot-primitives = { path = "../../../rootchain-upgrade-experiments/primitives" }
+polkadot-runtime-parachains = { path = "../../../rootchain-upgrade-experiments/runtime/parachains" }
