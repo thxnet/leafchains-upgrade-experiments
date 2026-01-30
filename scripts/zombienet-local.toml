@@ -5,11 +5,13 @@
 # - LeafchainB (Para ID 2001) with 2 collators (Charlie, Dave)
 #
 # Usage:
+#   export RELAY_BIN=/path/to/rootchain/target/release/polkadot
+#   export COLLATOR_BIN=/path/to/leafchains/target/release/thxnet-leafchain
 #   zombienet spawn scripts/zombienet-local.toml
 #
 # Prerequisites:
-#   - Build rootchain: cargo build --release -p polkadot --features thxnet-native
-#   - Build leafchain: cargo build --release -p thxnet-leafchain
+#   - Build rootchain binary (polkadot)
+#   - Build leafchain binary (thxnet-leafchain)
 #   - Install zombienet: npm install -g @zombienet/cli
 #     or download from https://github.com/paritytech/zombienet/releases
 
@@ -18,16 +20,20 @@ timeout = 1000
 
 [relaychain]
 chain = "thxnet-local"
-default_command = "/home/raj/thxnet/rootchain-upgrade-experiments/target/release/polkadot"
+default_command = "{{RELAY_BIN}}"
 default_args = ["-lparachain=debug"]
 
   [[relaychain.nodes]]
   name = "alice"
   validator = true
+  rpc_port = 9944
+  p2p_port = 30333
 
   [[relaychain.nodes]]
   name = "bob"
   validator = true
+  rpc_port = 9945
+  p2p_port = 30334
 
 [[parachains]]
 id = 2000
@@ -36,13 +42,17 @@ cumulus_based = true
 
   [parachains.collator]
   name = "leafchain-a-collator-1"
-  command = "/home/raj/thxnet/leafchains-upgrade-experiments/target/release/thxnet-leafchain"
+  command = "{{COLLATOR_BIN}}"
   args = ["-lparachain=debug,xcm=trace"]
+  rpc_port = 9946
+  p2p_port = 31333
 
   [[parachains.collators]]
   name = "leafchain-a-collator-2"
-  command = "/home/raj/thxnet/leafchains-upgrade-experiments/target/release/thxnet-leafchain"
+  command = "{{COLLATOR_BIN}}"
   args = ["-lparachain=debug,xcm=trace"]
+  rpc_port = 9947
+  p2p_port = 31334
 
 [[parachains]]
 id = 2001
@@ -51,13 +61,17 @@ cumulus_based = true
 
   [parachains.collator]
   name = "leafchain-b-collator-1"
-  command = "/home/raj/thxnet/leafchains-upgrade-experiments/target/release/thxnet-leafchain"
+  command = "{{COLLATOR_BIN}}"
   args = ["-lparachain=debug,xcm=trace"]
+  rpc_port = 9948
+  p2p_port = 32333
 
   [[parachains.collators]]
   name = "leafchain-b-collator-2"
-  command = "/home/raj/thxnet/leafchains-upgrade-experiments/target/release/thxnet-leafchain"
+  command = "{{COLLATOR_BIN}}"
   args = ["-lparachain=debug,xcm=trace"]
+  rpc_port = 9949
+  p2p_port = 32334
 
 # HRMP channels for cross-chain messaging
 [[hrmp_channels]]
