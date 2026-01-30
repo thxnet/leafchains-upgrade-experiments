@@ -83,6 +83,14 @@ run_bg "relay-bob" "$RELAY_BIN" \
 echo "Waiting for relay chain to start producing blocks..."
 sleep 10
 
+# Extract Alice's peer ID dynamically from relay-alice log
+RELAY_PEER_ID=$(grep 'Local node identity' "$BASE_DIR/relay-alice.log" 2>/dev/null | head -1 | sed 's/.*: //')
+if [ -z "$RELAY_PEER_ID" ]; then
+    echo "Warning: Could not extract relay Alice peer ID from log, collator bootnodes may fail"
+    RELAY_PEER_ID="unknown"
+fi
+echo "Relay Alice peer ID: $RELAY_PEER_ID"
+
 # ===== LEAFCHAIN A (Para ID 2000) =====
 echo ""
 echo "--- Exporting genesis for LeafchainA (Para ID 2000) ---"
@@ -109,7 +117,7 @@ run_bg "leafchain-a-alice" "$COLLATOR_BIN" \
     --chain thxnet-local \
     --port 31334 \
     --rpc-port 9947 \
-    --bootnodes "/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp"
+    --bootnodes "/ip4/127.0.0.1/tcp/30333/p2p/$RELAY_PEER_ID"
 
 sleep 2
 
@@ -128,7 +136,7 @@ run_bg "leafchain-a-bob" "$COLLATOR_BIN" \
     --chain thxnet-local \
     --port 31336 \
     --rpc-port 9949 \
-    --bootnodes "/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp"
+    --bootnodes "/ip4/127.0.0.1/tcp/30333/p2p/$RELAY_PEER_ID"
 
 # ===== LEAFCHAIN B (Para ID 2001) =====
 echo ""
@@ -155,7 +163,7 @@ run_bg "leafchain-b-charlie" "$COLLATOR_BIN" \
     --chain thxnet-local \
     --port 32334 \
     --rpc-port 9951 \
-    --bootnodes "/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp"
+    --bootnodes "/ip4/127.0.0.1/tcp/30333/p2p/$RELAY_PEER_ID"
 
 sleep 2
 
@@ -174,7 +182,7 @@ run_bg "leafchain-b-dave" "$COLLATOR_BIN" \
     --chain thxnet-local \
     --port 32336 \
     --rpc-port 9953 \
-    --bootnodes "/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp"
+    --bootnodes "/ip4/127.0.0.1/tcp/30333/p2p/$RELAY_PEER_ID"
 
 echo ""
 echo "=== Network Started ==="

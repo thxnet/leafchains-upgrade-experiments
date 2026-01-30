@@ -16,8 +16,8 @@ use sc_chain_spec::Properties;
 use sc_service::ChainType;
 use sp_core::sr25519;
 
-/// The default XCM version to set in genesis config.
-pub const UNITS: Balance = 1_000_000_000_000; // 10^12 (12 decimals like relay chain)
+/// Base unit for token amounts (10^12, 12 decimal places like the relay chain).
+pub const UNITS: Balance = 1_000_000_000_000;
 
 /// Rootchain names for local development
 const ROOTCHAIN_LOCAL_NAME: &str = "thxnet_local";

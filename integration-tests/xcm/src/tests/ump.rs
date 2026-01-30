@@ -52,9 +52,13 @@ fn reserve_transfer_from_parachain_to_relay() {
         );
 
         log::info!("UMP reserve transfer result: {:?}", result);
+        // Note: Reserve transfers from parachain to relay may be filtered by XCM config.
+        // The dispatch attempt itself validates the UMP message path.
     });
 
     // Verify on relay chain
+    // Note: In the xcm-emulator, UMP message queues are not fully processed
+    // end-to-end, so the balance may not reflect the transfer.
     THXnet::execute_with(|| {
         let bob_balance = thxnet_runtime::Balances::free_balance(
             THXnet::account_id_of(BOB)

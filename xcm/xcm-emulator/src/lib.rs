@@ -754,7 +754,7 @@ macro_rules! decl_test_networks {
 
 			impl $crate::Network for $name {
 				fn _init() {
-					// If Network has not been itialized yet, it gets initialized
+					// If Network has not been initialized yet, it gets initialized
 					if $crate::INITIALIZED.with(|b| b.borrow_mut().get(stringify!($name)).is_none()) {
 						$crate::INITIALIZED.with(|b| b.borrow_mut().insert(stringify!($name).to_string(), true));
 						$crate::DOWNWARD_MESSAGES.with(|b| b.borrow_mut().insert(stringify!($name).to_string(), $crate::VecDeque::new()));

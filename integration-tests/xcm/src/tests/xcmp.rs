@@ -41,6 +41,8 @@ fn reserve_transfer_between_parachains() {
     });
 
     // Verify on LeafchainB
+    // Note: Reserve transfers between sibling parachains are filtered by XCM config,
+    // so Bob's balance may not change. This test verifies the message dispatch path.
     LeafchainB::execute_with(|| {
         let bob_balance = general_runtime::Balances::free_balance(
             LeafchainB::account_id_of(BOB)
@@ -102,6 +104,8 @@ fn bidirectional_xcmp_transfers() {
     });
 
     // Verify final states
+    // Note: Reserve transfers between sibling parachains are filtered by XCM config,
+    // so balances may not change. This test verifies bidirectional message dispatch.
     LeafchainA::execute_with(|| {
         let charlie_balance = general_runtime::Balances::free_balance(
             LeafchainA::account_id_of(CHARLIE)
