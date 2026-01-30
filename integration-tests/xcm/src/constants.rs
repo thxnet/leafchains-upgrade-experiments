@@ -66,17 +66,28 @@ pub mod thxnet {
         AssignmentId,
         AuthorityDiscoveryId,
     )> {
-        vec![(
-            // Alice as both stash and controller
-            get_account_id_from_seed::<sr25519::Public>("Alice"),
-            get_account_id_from_seed::<sr25519::Public>("Alice"),
-            get_from_seed::<GrandpaId>("Alice"),
-            get_from_seed::<BabeId>("Alice"),
-            get_from_seed::<ImOnlineId>("Alice"),
-            get_from_seed::<ValidatorId>("Alice"),
-            get_from_seed::<AssignmentId>("Alice"),
-            get_from_seed::<AuthorityDiscoveryId>("Alice"),
-        )]
+        vec![
+            (
+                get_account_id_from_seed::<sr25519::Public>("Alice"),
+                get_account_id_from_seed::<sr25519::Public>("Alice"),
+                get_from_seed::<GrandpaId>("Alice"),
+                get_from_seed::<BabeId>("Alice"),
+                get_from_seed::<ImOnlineId>("Alice"),
+                get_from_seed::<ValidatorId>("Alice"),
+                get_from_seed::<AssignmentId>("Alice"),
+                get_from_seed::<AuthorityDiscoveryId>("Alice"),
+            ),
+            (
+                get_account_id_from_seed::<sr25519::Public>("Bob"),
+                get_account_id_from_seed::<sr25519::Public>("Bob"),
+                get_from_seed::<GrandpaId>("Bob"),
+                get_from_seed::<BabeId>("Bob"),
+                get_from_seed::<ImOnlineId>("Bob"),
+                get_from_seed::<ValidatorId>("Bob"),
+                get_from_seed::<AssignmentId>("Bob"),
+                get_from_seed::<AuthorityDiscoveryId>("Bob"),
+            ),
+        ]
     }
 
     pub fn genesis() -> Storage {
@@ -126,7 +137,7 @@ pub mod thxnet {
                     })
                     .collect(),
                 invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
-                force_era: Forcing::ForceNone,
+                force_era: Forcing::NotForcing,
                 slash_reward_fraction: Perbill::from_percent(10),
                 ..Default::default()
             },
@@ -137,6 +148,9 @@ pub mod thxnet {
             grandpa: Default::default(),
             authority_discovery: Default::default(),
             im_online: Default::default(),
+            sudo: thxnet_runtime::SudoConfig {
+                key: Some(get_account_id_from_seed::<sr25519::Public>(ALICE)),
+            },
             ..Default::default()
         };
         genesis_config.build_storage().unwrap()
@@ -150,6 +164,13 @@ pub mod leafchain_a {
     pub const PARA_ID: u32 = 2000;
 
     pub fn genesis() -> Storage {
+        let invulnerables: Vec<(AccountId, general_runtime::AuraId)> = vec![
+            (
+                get_account_id_from_seed::<sr25519::Public>(ALICE),
+                get_from_seed::<general_runtime::AuraId>(ALICE),
+            ),
+        ];
+
         let genesis_config = general_runtime::GenesisConfig {
             system: general_runtime::SystemConfig {
                 code: general_runtime::WASM_BINARY
@@ -166,6 +187,25 @@ pub mod leafchain_a {
             parachain_info: general_runtime::ParachainInfoConfig {
                 parachain_id: PARA_ID.into(),
             },
+            collator_selection: general_runtime::CollatorSelectionConfig {
+                invulnerables: invulnerables.iter().cloned().map(|(acc, _)| acc).collect(),
+                candidacy_bond: 0,
+                ..Default::default()
+            },
+            session: general_runtime::SessionConfig {
+                keys: invulnerables
+                    .into_iter()
+                    .map(|(acc, aura)| {
+                        (
+                            acc.clone(),
+                            acc,
+                            general_runtime::SessionKeys { aura },
+                        )
+                    })
+                    .collect(),
+            },
+            aura: Default::default(),
+            aura_ext: Default::default(),
             ..Default::default()
         };
         genesis_config.build_storage().unwrap()
@@ -179,6 +219,13 @@ pub mod leafchain_b {
     pub const PARA_ID: u32 = 2001;
 
     pub fn genesis() -> Storage {
+        let invulnerables: Vec<(AccountId, general_runtime::AuraId)> = vec![
+            (
+                get_account_id_from_seed::<sr25519::Public>(BOB),
+                get_from_seed::<general_runtime::AuraId>(BOB),
+            ),
+        ];
+
         let genesis_config = general_runtime::GenesisConfig {
             system: general_runtime::SystemConfig {
                 code: general_runtime::WASM_BINARY
@@ -195,6 +242,25 @@ pub mod leafchain_b {
             parachain_info: general_runtime::ParachainInfoConfig {
                 parachain_id: PARA_ID.into(),
             },
+            collator_selection: general_runtime::CollatorSelectionConfig {
+                invulnerables: invulnerables.iter().cloned().map(|(acc, _)| acc).collect(),
+                candidacy_bond: 0,
+                ..Default::default()
+            },
+            session: general_runtime::SessionConfig {
+                keys: invulnerables
+                    .into_iter()
+                    .map(|(acc, aura)| {
+                        (
+                            acc.clone(),
+                            acc,
+                            general_runtime::SessionKeys { aura },
+                        )
+                    })
+                    .collect(),
+            },
+            aura: Default::default(),
+            aura_ext: Default::default(),
             ..Default::default()
         };
         genesis_config.build_storage().unwrap()

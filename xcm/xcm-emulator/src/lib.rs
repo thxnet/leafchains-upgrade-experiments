@@ -743,6 +743,11 @@ macro_rules! decl_test_networks {
 
 					<$relay_chain>::reset_ext();
 					$( <$parachain>::reset_ext(); )*
+
+					// Re-initialize network state (PARA_IDS, message queues, etc.)
+					// before prepare_for_xcmp which depends on them
+					Self::_init();
+
 					$( <$parachain>::prepare_for_xcmp(); )*
 				}
 			}

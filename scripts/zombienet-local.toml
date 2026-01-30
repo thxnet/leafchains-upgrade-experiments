@@ -18,7 +18,7 @@ timeout = 1000
 
 [relaychain]
 chain = "thxnet-local"
-default_command = "../rootchain/target/release/polkadot"
+default_command = "/home/raj/thxnet/rootchain-upgrade-experiments/target/release/polkadot"
 default_args = ["-lparachain=debug"]
 
   [[relaychain.nodes]]
@@ -36,12 +36,12 @@ cumulus_based = true
 
   [parachains.collator]
   name = "leafchain-a-collator-1"
-  command = "./target/release/thxnet-leafchain"
+  command = "/home/raj/thxnet/leafchains-upgrade-experiments/target/release/thxnet-leafchain"
   args = ["-lparachain=debug,xcm=trace"]
 
   [[parachains.collators]]
   name = "leafchain-a-collator-2"
-  command = "./target/release/thxnet-leafchain"
+  command = "/home/raj/thxnet/leafchains-upgrade-experiments/target/release/thxnet-leafchain"
   args = ["-lparachain=debug,xcm=trace"]
 
 [[parachains]]
@@ -51,12 +51,12 @@ cumulus_based = true
 
   [parachains.collator]
   name = "leafchain-b-collator-1"
-  command = "./target/release/thxnet-leafchain"
+  command = "/home/raj/thxnet/leafchains-upgrade-experiments/target/release/thxnet-leafchain"
   args = ["-lparachain=debug,xcm=trace"]
 
   [[parachains.collators]]
   name = "leafchain-b-collator-2"
-  command = "./target/release/thxnet-leafchain"
+  command = "/home/raj/thxnet/leafchains-upgrade-experiments/target/release/thxnet-leafchain"
   args = ["-lparachain=debug,xcm=trace"]
 
 # HRMP channels for cross-chain messaging
