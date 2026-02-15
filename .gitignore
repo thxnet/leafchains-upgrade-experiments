@@ -23,3 +23,9 @@ result
 .direnv/
 
 .claude/settings.local.json
+
+# Local wrapper scripts (hardcoded nix store paths, server-specific)
+scripts/*-wrapper.sh
+scripts/gen-compat-chainspec.sh
+scripts/zombienet-compat-*.toml
+scripts/thxnet-local-compat.json*
