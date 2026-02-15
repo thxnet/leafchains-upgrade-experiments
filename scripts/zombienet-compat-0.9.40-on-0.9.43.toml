@@ -1,0 +1,83 @@
+# Zombienet configuration for binary compatibility testing
+# v0.9.43 binaries + v0.9.40 runtime WASM
+#
+# This tests the "node-only upgrade" scenario:
+# - Relay chain runs v0.9.43 polkadot binary with v0.9.40 runtime
+# - Leafchains run v0.9.43 thxnet-leafchain binary with v0.9.40 runtime
+#
+# Prerequisites:
+#   1. Build v0.9.40 WASMs:
+#      cd /home/raj/thxnet/rootchain && nix develop --command bash -c "cargo build --release --package thxnet-runtime"
+#      cd /home/raj/thxnet/leafchains && nix develop --command bash -c "cargo build --release --package general-runtime"
+#   2. Generate compat chain spec:
+#      ./scripts/gen-compat-chainspec.sh
+#   3. Spawn:
+#      export RELAY_BIN=/home/raj/thxnet/leafchains-upgrade-experiments/scripts/polkadot-wrapper.sh
+#      export COLLATOR_BIN=/home/raj/thxnet/leafchains-upgrade-experiments/scripts/leafchain-wrapper.sh
+#      export RELAY_CHAIN_SPEC=/home/raj/thxnet/leafchains-upgrade-experiments/scripts/thxnet-local-compat.json
+#      zombienet spawn scripts/zombienet-compat-0.9.40-on-0.9.43.toml
+#
+# Pass criteria:
+#   - Relay chain starts and produces blocks with v0.9.40 runtime on v0.9.43 binary
+#   - Leafchains start and produce parachain blocks
+#   - No panics, no state corruption
+#   - RPC endpoints respond correctly
+
+[settings]
+timeout = 1000
+provider = "native"
+
+[relaychain]
+chain = "thxnet-local"
+chain_spec_path = "/home/raj/thxnet/leafchains-upgrade-experiments/scripts/thxnet-local-compat.json"
+default_command = "{{RELAY_BIN}}"
+default_args = ["-lparachain=debug"]
+
+  [[relaychain.nodes]]
+  name = "alice"
+  validator = true
+  rpc_port = 9944
+  p2p_port = 30333
+
+  [[relaychain.nodes]]
+  name = "bob"
+  validator = true
+  rpc_port = 9945
+  p2p_port = 30334
+
+[[parachains]]
+id = 2000
+chain = "leafchain-a-local"
+cumulus_based = true
+
+  [parachains.collator]
+  name = "leafchain-a-collator-1"
+  command = "{{COLLATOR_BIN}}"
+  args = ["-lparachain=debug,xcm=trace"]
+  rpc_port = 9946
+  p2p_port = 31333
+
+[[parachains]]
+id = 2001
+chain = "leafchain-b-local"
+cumulus_based = true
+
+  [parachains.collator]
+  name = "leafchain-b-collator-1"
+  command = "{{COLLATOR_BIN}}"
+  args = ["-lparachain=debug,xcm=trace"]
+  rpc_port = 9948
+  p2p_port = 32333
+
+# HRMP channels for cross-chain messaging
+[[hrmp_channels]]
+sender = 2000
+recipient = 2001
+max_capacity = 8
+max_message_size = 512
+
+[[hrmp_channels]]
+sender = 2001
+recipient = 2000
+max_capacity = 8
+max_message_size = 512

@@ -19,6 +19,7 @@ pub const STORAGE_VERSION: StorageVersion = StorageVersion::new(1);
 /// Migration from v0 (no pallet deployed) to v1 (initial deployment)
 pub mod v1 {
     use super::*;
+    use sp_std::vec::Vec;
 
     /// Initial deployment migration
     ///
@@ -53,7 +54,7 @@ pub mod v1 {
         }
 
         #[cfg(feature = "try-runtime")]
-        fn pre_upgrade() -> Result<Vec<u8>, &'static str> {
+        fn pre_upgrade() -> Result<Vec<u8>, sp_runtime::TryRuntimeError> {
             let current_version = Pallet::<T>::on_chain_storage_version();
 
             // Ensure we're migrating from v0
@@ -70,7 +71,7 @@ pub mod v1 {
         }
 
         #[cfg(feature = "try-runtime")]
-        fn post_upgrade(_state: Vec<u8>) -> Result<(), &'static str> {
+        fn post_upgrade(_state: Vec<u8>) -> Result<(), sp_runtime::TryRuntimeError> {
             let current_version = Pallet::<T>::on_chain_storage_version();
 
             // Ensure we're now at v1

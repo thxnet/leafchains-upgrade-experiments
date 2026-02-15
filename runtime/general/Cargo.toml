@@ -99,6 +99,7 @@ std = [
     "frame-support/std",
     "frame-system-rpc-runtime-api/std",
     "frame-system/std",
+    "frame-try-runtime/std",
     "log/std",
     "pallet-asset-tx-payment/std",
     "pallet-assets/std",
