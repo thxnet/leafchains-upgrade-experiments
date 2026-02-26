@@ -11,23 +11,9 @@ members = [
 ]
 
 [workspace.package]
-version = "0.4.0"
+version = "0.5.0"
 authors = ["THXLAB PTE. LTD. <contact@thxlab.io>"]
 homepage = "https://thxnet.org/"
 repository = "https://github.com/thxnet/leafchains"
 license = "GPL-3.0-only"
 edition = "2021"
-
-# Patch polkadot crates to use local rootchain paths
-# This ensures all polkadot-related types are consistent across dependencies
-[patch."https://github.com/paritytech/polkadot"]
-polkadot-parachain = { path = "../rootchain-upgrade-experiments/parachain" }
-polkadot-primitives = { path = "../rootchain-upgrade-experiments/primitives" }
-polkadot-core-primitives = { path = "../rootchain-upgrade-experiments/core-primitives" }
-polkadot-runtime-parachains = { path = "../rootchain-upgrade-experiments/runtime/parachains" }
-polkadot-runtime-common = { path = "../rootchain-upgrade-experiments/runtime/common" }
-polkadot-runtime-metrics = { path = "../rootchain-upgrade-experiments/runtime/metrics" }
-xcm = { path = "../rootchain-upgrade-experiments/xcm" }
-xcm-executor = { path = "../rootchain-upgrade-experiments/xcm/xcm-executor" }
-xcm-builder = { path = "../rootchain-upgrade-experiments/xcm/xcm-builder" }
-pallet-xcm = { path = "../rootchain-upgrade-experiments/xcm/pallet-xcm" }
