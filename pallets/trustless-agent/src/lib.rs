@@ -459,6 +459,9 @@ pub mod pallet {
         type WeightInfo: WeightInfo;
     }
 
+    #[pallet::hooks]
+    impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
+
     // ===== Storage =====
 
     /// Storage for escrow information
